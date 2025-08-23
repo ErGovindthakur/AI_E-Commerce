@@ -2,7 +2,8 @@ import jwt from "jsonwebtoken";
 
 export const authHandler = async(req,res,next) => {
      try {
-          // console.log(req.cookies)
+          // console.log("Cookies -: ",req.cookies)
+          // console.log("Token -: ",req.cookies.token)
           const token = req.cookies.token;
 
           if(!token){

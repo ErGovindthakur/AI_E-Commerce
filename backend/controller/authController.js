@@ -166,7 +166,7 @@ export const googleLogin = async (req, res) => {
       });
     }
 
-    const token = genToken(user._id);
+    const token = await genToken(user._id);
 
     res
       .status(200)
