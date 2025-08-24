@@ -8,10 +8,12 @@ import { FiEyeOff } from "react-icons/fi";
 import { authDataContext } from "../context/AuthContext";
 import { signInWithPopup } from "firebase/auth";
 import { auth, provider } from "../../utils/firebase";
+import { userDataContext } from "../context/UserContext";
 
 const SignUp = () => {
   const [show, setShow] = useState();
   const { serverUrl } = useContext(authDataContext);
+  const { getCurrentUser } = useContext(userDataContext);
 
   const [signUpForm, setSignUpForm] = useState({
     name: "",
@@ -41,9 +43,9 @@ const SignUp = () => {
         email: "",
         password: "",
       });
-      navigate("/login")
+      navigate("/login");
     } catch (err) {
-      toast.error(err?.response?.data?.message  || err.message)
+      toast.error(err?.response?.data?.message || err.message);
       console.log(err.message);
     }
   };
@@ -54,21 +56,32 @@ const SignUp = () => {
     setShow((prev) => !prev);
   };
 
-  const googleSignUp = async() => {
+  const googleSignUp = async () => {
     try {
-      const res = await signInWithPopup(auth,provider);
+      const res = await signInWithPopup(auth, provider);
       let user = res.user;
       let name = user.displayName;
       let email = user.email;
 
-      let googleData = await axios.post(`${serverUrl}/api/v1/auth/googleLogin`,{
-        name,email
-      },{withCredentials:true})
-      console.log(googleData)
+      let googleData = await axios.post(
+        `${serverUrl}/api/v1/auth/googleLogin`,
+        {
+          name,
+          email,
+        },
+        { withCredentials: true }
+      );
+
+      toast.success(
+        googleData?.data?.message || "Google verification Successfully..."
+      );
+      await getCurrentUser();
+      navigate("/");
+      console.log(googleData);
     } catch (err) {
-      console.log(err.message)
+      console.log(err.message);
     }
-  }
+  };
   return (
     <div className="w-full h-screen flex justify-center items-center bg-gradient-to-r from-gray-200 to-gray-100">
       {/* Card Container */}
@@ -79,8 +92,10 @@ const SignUp = () => {
         </h3>
 
         {/* Google Signup */}
-        <button className="w-full flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-md shadow-sm transition"
-        onClick={googleSignUp}>
+        <button
+          className="w-full flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-md shadow-sm transition"
+          onClick={googleSignUp}
+        >
           <img src={google} alt="google" className="w-5 h-5" />
           <span className="text-sm font-medium">Sign up with Google</span>
         </button>

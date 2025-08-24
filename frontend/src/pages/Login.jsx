@@ -8,6 +8,7 @@ import axios from "axios";
 import { authDataContext } from "../context/AuthContext";
 import { signInWithPopup } from "firebase/auth";
 import { auth, provider } from "../../utils/firebase";
+import { userDataContext } from "../context/UserContext";
 const Login = () => {
   const [show, setShow] = useState(false);
   const [loginForm, setLoginForm] = useState({
@@ -16,6 +17,7 @@ const Login = () => {
   });
 
   const { serverUrl } = useContext(authDataContext);
+  const {getCurrentUser} = useContext(userDataContext);
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
@@ -35,7 +37,7 @@ const Login = () => {
       });
 
       toast.success(res.data.message);
-
+      await getCurrentUser();
       navigate("/");
     } catch (err) {
       console.log(err.message);
@@ -63,6 +65,12 @@ const Login = () => {
       let googleData = await axios.post(`${serverUrl}/api/v1/auth/googleLogin`,{
         name,email
       },{withCredentials:true})
+
+      console.log(googleData)
+      toast.success(googleData?.data?.message || "Google verification Successfully...")
+      await getCurrentUser();
+
+      navigate("/")
       console.log(googleData)
     } catch (err) {
       console.log(err.message)
