@@ -1,20 +1,23 @@
 import React, { lazy, Suspense } from "react";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
-// import Home from './pages/Home'
+import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
+import Navbar from "./components/Navbar";
+import PrivateRoute from "./Private/PrivateRoute";
 
-// const Login = lazy(()=>import("./pages/Login"));
 const Home = lazy(() => import("./pages/Home"));
+
+// Layout that includes Navbar
+const Layout = () => (
+  <>
+    <Navbar />
+    <Outlet />
+  </>
+);
+
+
 const router = createBrowserRouter([
-  {
-    path: "/",
-    element: (
-      <Suspense fallback={<h2>Data is Loading..</h2>}>
-        <Home />
-      </Suspense>
-    ),
-  },
+  // Public routes (no navbar)
   {
     path: "/login",
     element: <Login />,
@@ -23,13 +26,26 @@ const router = createBrowserRouter([
     path: "/signup",
     element: <SignUp />,
   },
-]);
-const App = () => {
-  return (
-    <>
-      <RouterProvider router={router} />
-    </>
-  );
-};
 
-export default App;
+  // Protected routes (with navbar)
+  {
+    path: "/",
+    element: <Layout />,   // Navbar here
+    children: [
+      {
+        index: true,
+        element: (
+          <PrivateRoute>
+          <Suspense fallback={<h2>Loading...</h2>}>
+            <Home />
+          </Suspense>
+          </PrivateRoute>
+        ),
+      },
+    ],
+  },
+]);
+
+export default function App() {
+  return <RouterProvider router={router} />;
+}
