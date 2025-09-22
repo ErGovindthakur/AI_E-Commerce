@@ -14,11 +14,12 @@ const userSchema = new mongoose.Schema({
           type:String,
           required:function(){
               return !this.isGoogleUser
+              // if user will be google user then password>required>false, otherwise required>true
           }
      },
      isGoogleUser:{
           type:Boolean,
-          default:false
+          default:false, // if user will not login with google than password field will be required, otherwise password will not be required
      },
      cartDate:{
           type:Object,
